@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.env
+*.exe
+backend/icl-server
+load-testing/results/*.json
+!load-testing/results/.gitkeep

@@ -1,0 +1,21 @@
+ICL LOAD TEST — local run (Windows, Go 1.23, in-memory dev store, single backend)
+Date: 2026-11-17
+Command: go run ./load-testing/hammer -url http://localhost:8080/api/matches/104/score -c 2000 -n 20000 -stats http://localhost:8080
+
+Requests:     20000 (ok=19598 fail=402 — Windows ephemeral-port pressure)
+Duration:     1.571s
+Throughput:   12,727 req/s
+Avg latency:  134.9ms   (includes connection setup; steady-state hits are ~1ms)
+P50:          63.6ms
+P95:          363.5ms
+P99:          408.8ms
+DB queries during test:   1
+Coalesced requests:       3
+DB queries saved:         3
+
+Thundering-herd verification (earlier spike, 2000 simultaneous after invalidate):
+  DB queries: 1, succeeded 209/2000 (client-side conn limit then fixed)
+
+Note: with 2s TTL and a 1.57s run, nearly all requests were cache HITs.
+For the pure herd demo: POST /api/cache/invalidate/104 then
+POST /api/simulation/spike {"requests":5000} -> ~1 DB query, ~4999 coalesced.
